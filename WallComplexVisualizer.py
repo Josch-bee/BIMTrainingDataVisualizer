@@ -7,8 +7,8 @@ from dash import Dash, dcc, html, Input, Output
 # ---------------------------------------------------------------------------
 # 1. DATEIPFADE DEFINIEREN
 # ---------------------------------------------------------------------------
-PATH_XML = "data/mapping-results/generated/GraphOfSyntheticWalls2.xml"
-PATH_JSON = "data/mapping-results/generated/GraphOfSyntheticWalls2_points.json"
+PATH_XML = "../data/serialized-graph/GraphOfSyntheticWalls2.xml"
+PATH_JSON = "../data/serialized-graph/GraphOfSyntheticWalls2_points.json"
 
 NS = {"g": "http://graphml.graphdrawing.org/xmlns"}
 
