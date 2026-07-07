@@ -1,24 +1,22 @@
 import plotly.express as px
 import plotly.graph_objects as go
 
-from WallComplexVisualizer import segment_nodes, node_points
+from WallComplexVisualizer import segment_nodes, node_faces, make_face_mesh, make_face_outline
 
 # ---------------------------------------------------------------------------
-# Zeigt alle PCSegments gleichzeitig an, jedes in einer eigenen Farbe.
+# Zeigt alle PCSegments gleichzeitig an, jedes als konvexes Polygon (Fläche)
+# in einer eigenen Farbe.
 # ---------------------------------------------------------------------------
 COLORS = px.colors.qualitative.Alphabet
 
 traces = []
 for i, seg_id in enumerate(segment_nodes):
-    pts = node_points(seg_id)
-    if len(pts) == 0:
-        continue
-    traces.append(go.Scatter3d(
-        x=pts[:, 0], y=pts[:, 1], z=pts[:, 2],
-        mode="markers",
-        marker=dict(size=2, color=COLORS[i % len(COLORS)]),
-        name=f"Segment {seg_id}",
-    ))
+    color = COLORS[i % len(COLORS)]
+    for face in node_faces(seg_id):
+        mesh = make_face_mesh(face, color, opacity=0.7, name=f"Segment {seg_id}", showlegend=True)
+        if mesh is not None:
+            traces.append(mesh)
+        traces.append(make_face_outline(face, color, opacity=1.0))
 
 fig = go.Figure(
     data=traces,

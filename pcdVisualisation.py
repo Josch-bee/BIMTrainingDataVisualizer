@@ -38,4 +38,4 @@ def convertPlyToPcd(inputPath, outputPath):
 
 # savePcAsciiToBinary("data/pcd/LeRosaire.pcd", "data/pcd/LeRosaire_binary.pcd")
 # convertPlyToPcd("data/pc-data/generated/SchlossWeizernMediumHighCropped.ply", "data/pc-data/generated/SchlossWeizernMediumHighCropped.pcd")
-visualize_pcd("C:/Users/josch/Desktop/Joschua/Bachelorarbeit Lokal/data/pc-data/generated/SyntheticWalls1.pcd", False)
+visualize_pcd("C:/Users/josch/Desktop/Joschua/Bachelorarbeit Lokal/data/pc-data/SyntheticWalls2_gen_clusters.pcd", False)
