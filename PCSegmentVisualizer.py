@@ -1,7 +1,13 @@
 import plotly.express as px
 import plotly.graph_objects as go
 
-from WallComplexVisualizer import segment_nodes, node_faces, make_face_mesh, make_face_outline
+from WallGraph import WallGraph
+
+PATH_XML = "../data/serialized-graph/GraphOfSyntheticWalls3.xml"
+PATH_JSON = "../data/serialized-graph/GraphOfSyntheticWalls3_points.json"
+
+graph = WallGraph(PATH_XML, PATH_JSON)
+segment_nodes = graph.nodes_of_type("PCSegment")
 
 # ---------------------------------------------------------------------------
 # Zeigt alle PCSegments gleichzeitig an, jedes als konvexes Polygon (Fläche)
@@ -12,11 +18,11 @@ COLORS = px.colors.qualitative.Alphabet
 traces = []
 for i, seg_id in enumerate(segment_nodes):
     color = COLORS[i % len(COLORS)]
-    for face in node_faces(seg_id):
-        mesh = make_face_mesh(face, color, opacity=0.7, name=f"Segment {seg_id}", showlegend=True)
+    for face in graph.node_faces(seg_id):
+        mesh = graph.make_face_mesh(face, color, opacity=1, name=f"Segment {seg_id}", showlegend=True)
         if mesh is not None:
             traces.append(mesh)
-        traces.append(make_face_outline(face, color, opacity=1.0))
+        traces.append(graph.make_face_outline(face, color, opacity=1.0))
 
 fig = go.Figure(
     data=traces,
