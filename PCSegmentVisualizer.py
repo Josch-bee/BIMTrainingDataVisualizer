@@ -23,6 +23,7 @@ fig = go.Figure(
     layout=go.Layout(
         margin=dict(l=0, r=0, b=0, t=0),
         scene=dict(aspectmode="data"),
+        hoverlabel=dict(namelength=-1),
     ),
 )
 fig.show()
