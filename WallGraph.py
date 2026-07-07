@@ -11,14 +11,18 @@ class WallGraph:
     stellt Hilfsfunktionen zur Face- und Plotly-Darstellung bereit."""
 
     def __init__(self, xml_path, json_path):
-        self.nodes = self._load_nodes(xml_path)
+        self.nodes, self.edges = self._load_graph(xml_path)
         self.points_by_pool = self._load_points(json_path)
 
     @staticmethod
-    def _load_nodes(xml_path):
+    def _load_graph(xml_path):
+        """Liest Knoten und Kanten. Kanteneigenschaften werden über die
+        <key>-Definitionen von 'keyN' auf ihren attr.name aufgelöst und je
+        nach attr.type in int/float umgewandelt."""
         tree = ET.parse(xml_path)
         root = tree.getroot()
         key_names = {key.get("id"): key.get("attr.name") for key in root.findall(".//g:key", NS)}
+        key_types = {key.get("id"): key.get("attr.type") for key in root.findall(".//g:key", NS)}
 
         nodes = {}
         for node in root.findall(".//g:node", NS):
@@ -30,7 +34,37 @@ class WallGraph:
                 elif name in attrs:
                     attrs[name] = data.text or ""
             nodes[node.get("id")] = attrs
-        return nodes
+
+        edges = []
+        for edge in root.findall(".//g:edge", NS):
+            properties = {}
+            for data in edge.findall("g:data", NS):
+                key_id = data.get("key")
+                name = key_names.get(key_id, key_id)
+                properties[name] = WallGraph._cast_value(data.text, key_types.get(key_id))
+            edges.append({
+                "source": edge.get("source"),
+                "target": edge.get("target"),
+                "properties": properties,
+            })
+
+        return nodes, edges
+
+    @staticmethod
+    def _cast_value(text, attr_type):
+        if text is None:
+            return ""
+        if attr_type == "double":
+            try:
+                return float(text)
+            except ValueError:
+                return text
+        if attr_type == "int":
+            try:
+                return int(text)
+            except ValueError:
+                return text
+        return text
 
     @staticmethod
     def _load_points(json_path):
