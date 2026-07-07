@@ -1,15 +1,15 @@
 import plotly.graph_objects as go
+import plotly.io as pio
 
 from WallGraph import WallGraph
 
 PATH_XML = "../data/serialized-graph/GraphOfSyntheticWalls3.xml"
 PATH_JSON = "../data/serialized-graph/GraphOfSyntheticWalls3_points.json"
-OUTPUT_HTML = "GraphOverview.html"
 
 NODE_TYPES = ["Wall", "WallPolygon", "PCSegment"]
 NODE_COLORS = {"Wall": "#4C72B0", "WallPolygon": "#55A868", "PCSegment": "#DD8452"}
 EDGE_COLORS = {"WallToWallPolygon": "#8172B2", "PCSegmentToWallPolygon": "#64B5CD"}
-SAMPLES_PER_EDGE = 15  # Zwischenpunkte je Kante, damit ein Klick entlang der ganzen Linie erkannt wird
+SAMPLES_PER_EDGE = 25  # Zwischenpunkte je Kante, damit ein Klick entlang der ganzen Linie erkannt wird
 
 graph = WallGraph(PATH_XML, PATH_JSON)
 
@@ -48,6 +48,8 @@ for edge in graph.edges:
     ))
 
 # --- Knoten je Typ als eigene Spur ---
+TEXT_POSITIONS = {"Wall": "middle left", "WallPolygon": "top center", "PCSegment": "middle right"}
+
 for node_type in NODE_TYPES:
     ids = graph.nodes_of_type(node_type)
     if not ids:
@@ -56,9 +58,12 @@ for node_type in NODE_TYPES:
     traces.append(go.Scatter(
         x=[positions[n][0] for n in ids],
         y=[positions[n][1] for n in ids],
-        mode="markers",
+        mode="markers+text",
         marker=dict(size=16, color=NODE_COLORS[node_type], line=dict(color="white", width=1)),
         text=labels,
+        textposition=TEXT_POSITIONS[node_type],
+        textfont=dict(size=11),
+        cliponaxis=False,
         hoverinfo="text",
         name=node_type,
     ))
@@ -66,11 +71,12 @@ for node_type in NODE_TYPES:
 fig = go.Figure(
     data=traces,
     layout=go.Layout(
-        margin=dict(l=20, r=20, b=20, t=20),
+        margin=dict(l=140, r=140, b=20, t=20),
         xaxis=dict(visible=False),
         yaxis=dict(visible=False),
         plot_bgcolor="white",
         legend=dict(yanchor="top", y=0.99, xanchor="left", x=0.01),
+        hoverdistance=40,  # großzügigere Trefftoleranz beim Klicken auf Kanten
     ),
 )
 
@@ -100,4 +106,6 @@ gd.on('plotly_click', function(data) {
 });
 """
 
-fig.write_html(OUTPUT_HTML, post_script=CLICK_SCRIPT)
+pio.renderers.default = "browser"
+pio.renderers["browser"].post_script = CLICK_SCRIPT
+fig.show()
