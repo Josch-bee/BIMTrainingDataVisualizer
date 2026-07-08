@@ -1,10 +1,17 @@
+import argparse
+
 import plotly.graph_objects as go
 import plotly.io as pio
 
 from WallGraph import WallGraph
 
-PATH_XML = "../data/serialized-graph/GraphOfSyntheticWalls3.xml"
-PATH_JSON = "../data/serialized-graph/GraphOfSyntheticWalls3_points.json"
+parser = argparse.ArgumentParser()
+parser.add_argument("--xml", dest="path_xml", default="../data/serialized-graph/GraphOfSyntheticWalls3.xml")
+parser.add_argument("--json", dest="path_json", default="../data/serialized-graph/GraphOfSyntheticWalls3_points.json")
+args = parser.parse_args()
+
+PATH_XML = args.path_xml
+PATH_JSON = args.path_json
 
 NODE_TYPES = ["Wall", "WallPolygon", "PCSegment"]
 NODE_COLORS = {"Wall": "#4C72B0", "WallPolygon": "#55A868", "PCSegment": "#DD8452"}

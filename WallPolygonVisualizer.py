@@ -1,10 +1,17 @@
+import argparse
+
 import plotly.express as px
 import plotly.graph_objects as go
 
 from WallGraph import WallGraph
 
-PATH_XML = "../data/serialized-graph/GraphOfSyntheticWalls3.xml"
-PATH_JSON = "../data/serialized-graph/GraphOfSyntheticWalls3_points.json"
+parser = argparse.ArgumentParser()
+parser.add_argument("--xml", dest="path_xml", default="../data/serialized-graph/GraphOfSyntheticWalls3.xml")
+parser.add_argument("--json", dest="path_json", default="../data/serialized-graph/GraphOfSyntheticWalls3_points.json")
+args = parser.parse_args()
+
+PATH_XML = args.path_xml
+PATH_JSON = args.path_json
 
 graph = WallGraph(PATH_XML, PATH_JSON)
 polygon_nodes = graph.nodes_of_type("WallPolygon")
