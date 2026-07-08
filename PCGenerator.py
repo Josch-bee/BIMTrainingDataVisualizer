@@ -43,18 +43,17 @@ def generateWallSurfacePointCloud(geometryJson, resolution=0.05):
     
     for poly in polygons:
         # Extrahiere die Index-Liste für das aktuelle Polygon
-        faceIndices = poly["convexPolygon"]["indices"]
-        
-        # Jedes Polygon bei einer Wand hat 4 Eckpunkte (Viereck)
-        if len(faceIndices) == 4:
-            p0 = vertices[faceIndices[0]]
-            p1 = vertices[faceIndices[1]]
-            p2 = vertices[faceIndices[2]]
-            p3 = vertices[faceIndices[3]]
-            
-            # Fläche mit Punkten füllen
-            facePoints = samplePlane(p0, p1, p2, p3, resolution)
-            allPoints.append(facePoints)
+        faceIndices = poly["convexPolygons"]
+        for convexPoly in faceIndices:
+            if len(convexPoly) == 4:
+                p0 = vertices[convexPoly[0]]
+                p1 = vertices[convexPoly[1]]
+                p2 = vertices[convexPoly[2]]
+                p3 = vertices[convexPoly[3]]
+                
+                # Fläche mit Punkten füllen
+                facePoints = samplePlane(p0, p1, p2, p3, resolution)
+                allPoints.append(facePoints)
             
     # 3. Alle Punkte zusammenfügen
     if not allPoints:
@@ -89,7 +88,7 @@ def generatePointCloudFromBimJson(jsonPath, outputPcdPath, resolution=0.05):
 
 # --- Execution ---
 
-pcdWall = generatePointCloudFromBimJson("../data/bim-data/SyntheticWalls4.json", "../data/pc-data/SyntheticWalls4.pcd", resolution=0.05)
+pcdWall = generatePointCloudFromBimJson("../data/bim-data/SyntheticNew1.json", "../data/pc-data/SyntheticNew1.pcd", resolution=0.05)
 
 # Open preview of the generated point cloud
 o3d.visualization.draw_geometries([pcdWall])
