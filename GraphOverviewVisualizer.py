@@ -26,21 +26,47 @@ for col, node_type in enumerate(NODE_TYPES):
 traces = []
 
 # --- Kanten als anklickbare Linien ---
+# --- Definition der Thresholds und Breiten ---
+THRESHOLD_ANGLE = 2.0      # Maximaler Winkel
+THRESHOLD_DISTANCE = 0.001   # Maximale Distanz
+THRESHOLD_OVERLAP = 0.2     # Minimaler Overlap
+
+WIDTH_THICK = 4.5           # Linienstärke wenn Bedingung erfüllt
+WIDTH_NORMAL = 1          # Standard-Linienstärke
+
+# --- Kanten als anklickbare Linien ---
 for edge in graph.edges:
     if edge["source"] not in positions or edge["target"] not in positions:
         continue
     x0, y0 = positions[edge["source"]]
     x1, y1 = positions[edge["target"]]
-    color = EDGE_COLORS.get(edge["properties"].get("edge_type"), "lightgrey")
-    info = "<br>".join(f"{key}: {value}" for key, value in edge["properties"].items())
+    
+    props = edge["properties"]
+    edge_type = props.get("edge_type")
+    color = EDGE_COLORS.get(edge_type, "lightgrey")
+    info = "<br>".join(f"{key}: {value}" for key, value in props.items())
 
+    # --- Dynamische Strichstärke berechnen ---
+    line_width = WIDTH_NORMAL  # Standardwert
+    
+    if edge_type == "PCSegmentToWallPolygon":
+        # Werte aus den Properties ziehen
+        angle = float(props.get("angle", 0))
+        distance = float(props.get("distance", 0))
+        overlap = float(props.get("overlap", 0))
+        
+        # Bedingung prüfen: angle < threshold UND distance < threshold UND overlap > threshold
+        if angle < THRESHOLD_ANGLE and distance < THRESHOLD_DISTANCE and overlap > THRESHOLD_OVERLAP:
+            line_width = WIDTH_THICK
+
+    # Zwischenpunkte berechnen
     xs = [x0 + (x1 - x0) * t / (SAMPLES_PER_EDGE - 1) for t in range(SAMPLES_PER_EDGE)]
     ys = [y0 + (y1 - y0) * t / (SAMPLES_PER_EDGE - 1) for t in range(SAMPLES_PER_EDGE)]
 
     traces.append(go.Scatter(
         x=xs, y=ys,
         mode="lines",
-        line=dict(color=color, width=1.5),
+        line=dict(color=color, width=line_width),  # <-- Hier wird die dynamische Breite gesetzt
         marker=dict(size=5, color=color),
         customdata=[info] * SAMPLES_PER_EDGE,
         hoverinfo="none",

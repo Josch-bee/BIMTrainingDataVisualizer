@@ -89,7 +89,7 @@ def generatePointCloudFromBimJson(jsonPath, outputPcdPath, resolution=0.05):
 
 # --- Execution ---
 
-pcdWall = generatePointCloudFromBimJson("../data/bim-data/SyntheticWalls3.json", "../data/pc-data/SyntheticWalls3.pcd", resolution=0.05)
+pcdWall = generatePointCloudFromBimJson("../data/bim-data/SyntheticWalls4.json", "../data/pc-data/SyntheticWalls4.pcd", resolution=0.05)
 
 # Open preview of the generated point cloud
 o3d.visualization.draw_geometries([pcdWall])
